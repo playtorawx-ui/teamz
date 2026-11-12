@@ -4,7 +4,7 @@
  * bundled into the build or committed.
  */
 
-export type Provider = 'pollinations' | 'custom' | 'mock';
+export type Provider = 'orchestrator' | 'pollinations' | 'custom' | 'mock';
 
 export interface LlmSettings {
   provider: Provider;
@@ -16,6 +16,8 @@ export interface LlmSettings {
   referrer: string;
   /** Stream tokens as they arrive. */
   stream: boolean;
+  /** Base URL of the teamz FastAPI orchestrator (provider === 'orchestrator'). */
+  orchestratorUrl: string;
 }
 
 export const SETTINGS_KEY = 'teamz:llm-settings:v1';
@@ -32,12 +34,16 @@ export const DEFAULT_SETTINGS: LlmSettings = {
   apiKey: '',
   referrer: 'teamz',
   stream: true,
+  orchestratorUrl: 'http://localhost:8000',
 };
 
 export function normaliseSettings(raw: unknown): LlmSettings {
   const r = (raw && typeof raw === 'object' ? raw : {}) as Partial<LlmSettings>;
   const provider: Provider =
-    r.provider === 'custom' || r.provider === 'mock' || r.provider === 'pollinations'
+    r.provider === 'custom' ||
+    r.provider === 'mock' ||
+    r.provider === 'pollinations' ||
+    r.provider === 'orchestrator'
       ? r.provider
       : DEFAULT_SETTINGS.provider;
   return {
@@ -46,6 +52,10 @@ export function normaliseSettings(raw: unknown): LlmSettings {
     apiKey: typeof r.apiKey === 'string' ? r.apiKey : '',
     referrer: typeof r.referrer === 'string' ? r.referrer : DEFAULT_SETTINGS.referrer,
     stream: typeof r.stream === 'boolean' ? r.stream : DEFAULT_SETTINGS.stream,
+    orchestratorUrl:
+      typeof r.orchestratorUrl === 'string' && r.orchestratorUrl.trim()
+        ? r.orchestratorUrl.trim().replace(/\/$/, '')
+        : DEFAULT_SETTINGS.orchestratorUrl,
   };
 }
 
