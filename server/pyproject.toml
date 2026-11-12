@@ -1,0 +1,10 @@
+[project]
+name = "teamz-server"
+version = "0.2.0"
+description = "FastAPI agent orchestrator + keyless-first LLM routing layer for teamz"
+requires-python = ">=3.11"
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+filterwarnings = ["ignore::DeprecationWarning"]
